@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="css/amazeui.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/pullToRefresh.css"/>
+    <title>关注</title>
+    <style>
+        ul{
+            padding:0;
+            margin:0;
+        }
+        .search .follow{
+            width: 90%;
+        }
+        .follow-img{
+            width: 20px;
+            height: 20px;
+            position: fixed;
+            top: 0;
+            right:0;
+            margin: 13.5px;
+        }
+        .search .follow-search{
+            height: 30px;
+        }
+        .search-follow{
+            display: none;
+        }
+        .already{
+            width: 100%;
+            height: auto;
+            background-color: #ffffff;
+            padding: 10px;
+            text-align: center;
+        }
+        .already .follow-list-title{
+            font-size: 12px;
+            border-bottom: 1px solid #DADBDC;
+            height: 60px;
+            line-height: 60px;
+            text-align: -webkit-left;
+        }
+        .already .follow-state{
+            padding: 5px 10px;
+            border: 1px solid #DADBDC;
+            border-radius: 20px;
+            float: right;
+            background-color: #ffffff;
+            color: #DADBDC;
+            margin-top: 10px;
+        }
+        .already .follow-state-no{
+            padding: 5px 15px;
+            border: 1px solid #42C6C8;
+            border-radius: 20px;
+            float: right;
+            background-color: #ffffff;
+            color: #42C6C8;
+            margin-top: 10px;
+        }
+        .already .all{
+            font-size: 10px;
+            color: #afb0b0;
+            text-align: center;
+        }
+        .already img{
+            width: 10px;
+        }
+        .follow-list-recomm{
+            margin: 15px 0;
+        }
+        .follow-list .yixuan{
+            margin-left: 10px;
+        }
+        .follow-history{
+            display: none;
+        }
+        .follow-history .yixuan{
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="search">
+        <form action="" onsubmit="return checksearch()" id="searchForm" name="searchForm">
+            <div class="ui-searchbar-wrap ui-border-b follow">
+                <div class="ui-searchbar ui-border-radius follow-search">
+                    <div class="ui-searchbar-neirong">
+                        <img src="image/search.png">
+                        <span class="ui-searchbar-text follow-search">咨讯</span>
+                    </div>
+                    <div class="ui-searchbar-input">
+                        <img src="image/search.png" class="ui-input-img">
+                        <input onpropertychange="handle();" oninput="handle();" tabindex="1" name="word" id="search-kw"
+                               value="" type="text" placeholder="咨讯" autocapitalize="off">
+                    </div>
+                    <i class="ui-icon-close"></i>
+                </div>
+                <button type="submit" id="search_btn" class="ui-searchbar-cancel follow-cancel">取消</button>
+            </div>
+            <img src="image/shoucang.png" class="follow-img">
+        </form>
+    </div>
+</header>
+<section class="sec-result">
+    <div class="ui-tab" id="tab1">
+        <!--list列表-->
+        <div class="list-container" id="wrapper">
+            <ul>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- 关注页面搜索已关注公众号 -->
+<div class="follow-history">
+    <div class="follow-list-recomm">
+        <span class="yixuan">历史记录</span>
+        <div class="already">
+            <div class="follow-list-title">
+                <span>十点阅读</span>
+                <button class="follow-state-no">订阅</button>
+            </div>
+            <div class="follow-list-title">
+                <span>北京旅游攻略</span>
+                <button class="follow-state-no">订阅</button>
+            </div>
+            <div class="follow-list-title">
+                <span>云聚咨讯</span>
+                <button class="follow-state-no">订阅</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="ui-footer ui-footer-btn">
+    <ul class="ui-tiled active">
+        <li>
+            <a href="index.html">
+                <img src="image/home-g.png">
+                <div>
+                    <span>首页</span>
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="follow.html">
+                <img src="image/guanzhu-b.png">
+                <div>
+                    <span>关注</span>
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="person.html">
+                <img src="image/wode-g.png">
+                <div>
+                    <span>我的</span>
+                </div>
+            </a>
+        </li>
+    </ul>
+
+</footer>
+<!-- 搜索公众号进行关注 -->
+<div class="search-follow">
+    <div class="search">
+        <form action="" onsubmit="return search_follow()" id="searchForm2" name="searchForm">
+            <div class="ui-searchbar-wrap ui-border-b">
+                <div class="ui-searchbar ui-border-radius">
+                    <div class="ui-searchbar-input">
+                        <img src="image/search.png" class="ui-input-img">
+                        <input onpropertychange="handle();" oninput="handle2();" tabindex="1" name="word" id="search-kw2"
+                               value="" type="text" placeholder="咨讯" autocapitalize="off">
+                    </div>
+                    <i class="ui-icon-close"></i>
+                </div>
+                <button type="submit" id="search_btn2" class="ui-searchbar-cancel">取消</button>
+            </div>
+        </form>
+    </div>
+    <div class="follow-list">
+        <div class="follow-list-already">
+            <span class="yixuan">已经关注</span>
+            <div class="already">
+                <div class="follow-list-title">
+                    <span>QQ阅读</span>
+                    <button class="follow-state">取消关注</button>
+                </div>
+                <div class="follow-list-title">
+                    <span>QQ阅读</span>
+                    <button class="follow-state">取消关注</button>
+                </div>
+                <span class="all">展开全部</span>
+                <img src="image/jiazai-t.png">
+            </div>
+        </div>
+        <div class="follow-list-recomm">
+            <span class="yixuan">猜你喜欢</span>
+            <div class="already">
+                <div class="follow-list-title">
+                    <span>QQ阅读</span>
+                    <button class="follow-state-no">关注</button>
+                </div>
+                <div class="follow-list-title">
+                    <span>QQ阅读</span>
+                    <button class="follow-state-no">关注</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="http://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="js/iscroll.js"></script>
+<script src="js/pullToRefresh.js"></script>
+<script src="js/app.js" type="text/javascript"></script>
+<!--<script src="js/amazeui.min.js" type="text/javascript"></script>-->
+<script src="js/amazeui.lazyload.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function () {
+        //动态设置刷新的高度
+        $('#wrapper').css('height',window.screen.height-140+'px');
+    });
+    $('.ui-searchbar').on('click', function () {
+        $('.ui-searchbar-wrap').addClass('focus');
+        $('.ui-searchbar-input input').focus();
+        $('.ui-searchbar-neirong').addClass('none');
+        $('.ui-searchbar-wrap .ui-searchbar-input, .ui-searchbar-wrap button, .ui-searchbar-wrap .ui-icon-close .ui-input-img').css('display', 'block');
+    });
+    $('.follow-img').on('click',function () {
+        $('header').css('display','none');
+        $('section').css('display','none');
+        $('footer').css('display','none');
+        $('.search-follow').css('display','block');
+        $('.ui-searchbar-wrap').addClass('focus');
+        $('.ui-searchbar-input input').focus();
+        $('.ui-searchbar-neirong').addClass('none');
+        $('.ui-searchbar-wrap .ui-searchbar-input, .ui-searchbar-wrap button, .ui-searchbar-wrap .ui-icon-close .ui-input-img').css('display', 'block');
+    });
+
+    function checksearch() {
+        if ($.trim($("#search-kw").val()) == '') {
+            return false;
+        }
+        tijiao();
+    }
+    document.getElementById("search_btn").addEventListener("click", cancel, false);
+    //当状态改变的时候执行的函数
+    function handle() {
+        if ($("#search-kw").val() != '') {
+            $("#search_btn").html("检索");
+            document.getElementById("search_btn").removeEventListener("click", cancel, false);
+        } else {
+            $("#search_btn").html("取消");
+            document.getElementById("search_btn").addEventListener("click", cancel, false);
+        }
+    }
+    function tijiao() {
+        var query = '?';
+        document.searchform.action = g_site_url + '' + query + 'question/search/2' + g_suffix;
+        document.searchform.submit();
+    }
+    function cancel() {
+        $('.ui-searchbar-wrap').removeClass('focus');
+        $('.ui-searchbar-neirong').removeClass('none');
+        $('.ui-searchbar-wrap .ui-searchbar-input, .ui-searchbar-wrap button, .ui-searchbar-wrap .ui-icon-close .ui-input-img').css('display', 'none');
+    }
+    refresher.init({
+
+        id: "wrapper",
+
+        pullDownAction: Refresh,
+
+        pullUpAction: Load
+
+    });
+    var generatedCount = 0;
+    function Refresh() {
+        setTimeout(function () {	// <-- Simulate network congestion, remove setTimeout from production!
+
+            var el, li, i;
+
+            el = $("#wrapper ul");
+
+            el.html('')
+
+            for (i = 0; i < 2; i++) {
+
+                li = "<li class='ui-list'>"
+                    +"<img src='image/guanbi.png' class='guanbi'>"
+                    +" <div class='am-g ui-list-title'>"
+                    +" <img src='img/a3.png' class='am-u-sm-4'>"
+                    +" <div class='am-u-sm-8'>"
+                    +" <a>原来腾讯还出了这些良心app</a>"
+                    +" <div class='pet_hd_con_gp_list'>"
+                    +" <span class='pet_hd_con_gp_list_on'>VIP</span>"
+                    +" <span class='pet_hd_con_gp_list_on'>小程序</span>"
+                    +" </div>"
+                    +" </div>"
+                    +" </div>"
+                    +" <hr data-am-widget='divider' style='' class='am-divider am-divider-default user-divider'/>"
+                    +" <div class='am-g ui-list-author'>"
+                    +" <div class='am-u-sm-4 clean'>"
+                    +" <img src='img/a1.png'>"
+                    +" <span>信息咨讯</span>"
+                    +" </div>"
+                    +" <div class='am-u-sm-8'>"
+                    +" <span>刚刚</span>"
+                    +" <div class='zan'>"
+                    +" <img src='image/zan-g.png'>"
+                    +" <span>18</span>"
+                    +" </div>"
+                    +" </div>"
+                    +" </div>"
+                    +" </li>";
+                el.append(li)
+            }
+            myScroll.refresh();
+        }, 1000);
+    }
+    var o = '2';
+    function Load() {
+        setTimeout(function () {// <-- Simulate network congestion, remove setTimeout from production!
+            var el, li, i;
+            var img = 'img/a'+o+'.png';
+            o=parseInt(o)+1;
+            el = $("#wrapper ul");
+            for (i = 0; i < 2; i++) {
+                li = "<li class='ui-list'>"
+                    +"<img src='image/guanbi.png' class='guanbi'>"
+                    +" <div class='am-g ui-list-title'>"
+                    +" <img src="+img+" class='am-u-sm-4'>"
+                    +" <div class='am-u-sm-8'>"
+                    +" <a>烟雨江南，悠长又寂寥的雨巷</a>"
+                    +" <div class='pet_hd_con_gp_list'>"
+                    +" <span class='pet_hd_con_gp_list_on'>VIP</span>"
+                    +" <span class='pet_hd_con_gp_list_on'>小程序</span>"
+                    +" </div>"
+                    +" </div>"
+                    +" </div>"
+                    +" <hr data-am-widget='divider' style='' class='am-divider am-divider-default user-divider'/>"
+                    +" <div class='am-g ui-list-author'>"
+                    +" <div class='am-u-sm-4 clean'>"
+                    +" <img src='img/a1.png'>"
+                    +" <span>信息咨讯</span>"
+                    +" </div>"
+                    +" <div class='am-u-sm-8'>"
+                    +" <span>刚刚</span>"
+                    +" <div class='zan'>"
+                    +" <img src='image/zan-g.png'>"
+                    +" <span>18</span>"
+                    +" </div>"
+                    +" </div>"
+                    +" </div>"
+                    +" </li>";
+                el.append(li);
+            }
+            myScroll.refresh();
+        }, 1000);
+
+    }
+</script>
+
+</body>
+</html>
