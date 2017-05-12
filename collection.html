@@ -123,6 +123,10 @@
 <!--<script src="js/amazeui.min.js" type="text/javascript"></script>-->
 <script src="js/amazeui.lazyload.min.js" type="text/javascript"></script>
 <script type="text/javascript">
+    $(function () {
+        //动态设置刷新的高度
+        $('#wrapper').css('height',window.screen.height-140+'px');
+    });
     refresher.init({
 
         id: "wrapper",
