@@ -9,9 +9,14 @@
     <link rel="stylesheet" href="css/amazeui.min.css">
     <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/pullToRefresh.css"/>
-    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js" ></script>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script>
-        //       448a5593-1f97-457b-9bcb-1d4b6d9655d5
+        //        function resize(){
+        //            $('html').css('font-size',($(window).width())/4.14+'px');
+        //        };
+        //        window.onresize=resize;
+        //
+        //        $(function(){resize();});
     </script>
     <title>看点真的</title>
     <style>
@@ -44,7 +49,7 @@
     <div class="ui-tab" id="tab1">
         <ul class="ui-tab-nav ui-border-b">
             <li>
-                <a class="ajax_test" style="color: #42C6C8;">推荐</a>
+                <a class="test_ajax" href="" style="color: #42C6C8;">推荐</a>
             </li>
             <li>
                 <a href="">视频</a>
@@ -61,31 +66,31 @@
         <div class="list-container" id="wrapper">
             <ul>
                 <!--<li class="ui-list">-->
-                    <!--<img src="image/guanbi.png" class="guanbi">-->
-                    <!--<div class="am-g ui-list-title">-->
-                        <!--<img src="img/a1.png" class="am-u-sm-4">-->
-                        <!--<div class="am-u-sm-8">-->
-                            <!--<h5>热烈庆祝小程序上线</h5>-->
-                            <!--<div class="pet_hd_con_gp_list">-->
-                                <!--<span class="pet_hd_con_gp_list_on">VIP</span>-->
-                                <!--<span class="pet_hd_con_gp_list_on">小程序</span>-->
-                            <!--</div>-->
-                        <!--</div>-->
-                    <!--</div>-->
-                    <!--<hr data-am-widget="divider" style="" class="am-divider am-divider-default user-divider"/>-->
-                    <!--<div class="am-g ui-list-author">-->
-                        <!--<div class="am-u-sm-4 clean">-->
-                            <!--<img src="img/a1.png">-->
-                            <!--<span>信息咨讯</span>-->
-                        <!--</div>-->
-                        <!--<div class="am-u-sm-8">-->
-                            <!--<span>刚刚</span>-->
-                            <!--<div class="zan">-->
-                                <!--<img src="image/zan-g.png">-->
-                                <!--<span>18</span>-->
-                            <!--</div>-->
-                        <!--</div>-->
-                    <!--</div>-->
+                <!--<img src="image/guanbi.png" class="guanbi">-->
+                <!--<div class="am-g ui-list-title">-->
+                <!--<img src="img/a1.png" class="am-u-sm-4">-->
+                <!--<div class="am-u-sm-8">-->
+                <!--<h5>热烈庆祝小程序上线</h5>-->
+                <!--<div class="pet_hd_con_gp_list">-->
+                <!--<span class="pet_hd_con_gp_list_on">VIP</span>-->
+                <!--<span class="pet_hd_con_gp_list_on">小程序</span>-->
+                <!--</div>-->
+                <!--</div>-->
+                <!--</div>-->
+                <!--<hr data-am-widget="divider" style="" class="am-divider am-divider-default user-divider"/>-->
+                <!--<div class="am-g ui-list-author">-->
+                <!--<div class="am-u-sm-4 clean">-->
+                <!--<img src="img/a1.png">-->
+                <!--<span>信息咨讯</span>-->
+                <!--</div>-->
+                <!--<div class="am-u-sm-8">-->
+                <!--<span>刚刚</span>-->
+                <!--<div class="zan">-->
+                <!--<img src="image/zan-g.png">-->
+                <!--<span>18</span>-->
+                <!--</div>-->
+                <!--</div>-->
+                <!--</div>-->
                 <!--</li>-->
             </ul>
         </div>
@@ -157,27 +162,11 @@
 <!--<script src="js/amazeui.min.js" type="text/javascript"></script>-->
 <script src="js/amazeui.lazyload.min.js" type="text/javascript"></script>
 <script type="text/javascript">
-$(".ajax_test").on('click',function () {
-    $('button').click(function(){
-        var name = $(this).attr('name');
-        var url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxb893e79c73039a4c&redirect_uri=http%3a%2f%2ffxg.ruizsky.com%2findex%2flogin%2fget_wxid&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect'
-        $.ajax({
-            url:url,
-            type:"post",
-            data:"",
-            success:function(data)
-            {
-                alert("123");
-            },
-            error: function(){
-                alert('error');
-            }
-        });
-    });
-});
+
+
     $(function () {
         //动态设置刷新的高度
-        $('#wrapper').css('height',window.screen.height-180+'px');
+        $('#wrapper').css('height', window.screen.height - 180 + 'px');
     });
     refresher.init({
 
@@ -193,83 +182,141 @@ $(".ajax_test").on('click',function () {
 
         setTimeout(function () {	// <-- Simulate network congestion, remove setTimeout from production!
 
-            var el, li, i;
+            var el, li, i, zanimg;
 
             el = $("#wrapper ul");
 
             el.html('')
+            var data = JSON.stringify({"userid": "4e2ecf90-61b7-4314-8992-c34f2e541b7b","pages":"3"});
+            $.ajax({
+                url: 'http://101.200.76.209:8080/youxi/v1/contents',
+                type: "POST",
+                data: data,
+//                async: false,       //关键是这句
+                dataType: 'json',
+                contentType: "application/json",
+                success: function (data) {
+                    if (data.status == 200) {
+                        for (i = 0; i < data.conts.length; i++) {
+                            var lable = '';
+                            $.each(data.conts[i].labels,function (k, v) {
+                                lable = lable + "<span class='pet_hd_con_gp_list_on'>" + v.desp + "</span>";
+                            })
+                            if(data.conts[i].isthumbup == 1){
+                                zanimg = "image/zan-b.png";
+                            }else{
+                                zanimg = "image/zan-g.png";
+                            }
+                            li = "<li class='ui-list'>"
+                                + "<img src='image/guanbi.png' class='guanbi'>"
+                                + " <div class='am-g ui-list-title'>"
+                                + " <img src='" + data.conts[i].icon + "' class='am-u-sm-4'>"
+                                + " <div class='am-u-sm-8'>"
+                                + " <a data-url='" + data.conts[i].url + "' data-id = '" + data.conts[i].id + "'>" + data.conts[i].title + "</a>"
+                                + " <div class='pet_hd_con_gp_list'>"
+                                + lable
+                                + " </div>"
+                                + " </div>"
+                                + " </div>"
+                                + " <hr data-am-widget='divider' style='' class='am-divider am-divider-default user-divider'/>"
+                                + " <div class='am-g ui-list-author'>"
+                                + " <div class='am-u-sm-4 clean'>"
+                                + " <img src='img/a1.png'>"
+                                + " <span>" + data.conts[i].officialaccount + "</span>"
+                                + " </div>"
+                                + " <div class='am-u-sm-8'>"
+                                + " <span>" + data.conts[i].updatetime + "</span>"
+                                + " <div class='zan'>"
+                                + " <img src='"+zanimg+"' data-id='" + data.conts[i].id + "'>"
+                                + " <span>" + data.conts[i].qtyofthumbup + "</span>"
+                                + " </div>"
+                                + " </div>"
+                                + " </div>"
+                                + " </li>";
+                            el.append(li);
+                        }
+                    } else {
+                        new Toast({
+                            context: $('body'),
+                            message: '暂无更多数据'
+                        }).show();
+                    }
+                },
+                error: function () {
+                    alert('error');
+                }
+            });
 
-            for (i = 0; i < 2; i++) {
-
-            li = "<li class='ui-list'>"
-                +"<img src='image/guanbi.png' class='guanbi'>"
-                +" <div class='am-g ui-list-title'>"
-                +" <img src='img/a3.png' class='am-u-sm-4'>"
-                +" <div class='am-u-sm-8'>"
-                +" <a data-url='http://blog.csdn.net/mrbourne/article/details/60957652' data-id = '"+i+"'>原来腾讯还出了这些良心app</a>"
-                +" <div class='pet_hd_con_gp_list'>"
-                +" <span class='pet_hd_con_gp_list_on'>VIP</span>"
-                +" <span class='pet_hd_con_gp_list_on'>小程序</span>"
-                +" </div>"
-                +" </div>"
-                +" </div>"
-                +" <hr data-am-widget='divider' style='' class='am-divider am-divider-default user-divider'/>"
-                +" <div class='am-g ui-list-author'>"
-                +" <div class='am-u-sm-4 clean'>"
-                +" <img src='img/a1.png'>"
-                +" <span>信息咨讯</span>"
-                +" </div>"
-                +" <div class='am-u-sm-8'>"
-                +" <span>刚刚</span>"
-                +" <div class='zan'>"
-                +" <img src='image/zan-g.png'>"
-                +" <span>18</span>"
-                +" </div>"
-                +" </div>"
-                +" </div>"
-                +" </li>";
-                el.append(li)
-            }
             myScroll.refresh();
         }, 1000);
     }
-    var o = '2';
+
+//    for (var j = 0; j < data.conts[i].labels.length; j++) {
+//    lable = lable + "<span class='pet_hd_con_gp_list_on'>" + data.conts[i].labels[j] + "</span>";
+//    }
     function Load() {
         setTimeout(function () {// <-- Simulate network congestion, remove setTimeout from production!
             var el, li, i;
-            var img = 'img/a'+o+'.png';
-            o=parseInt(o)+1;
             el = $("#wrapper ul");
-            for (i = 0; i < 2; i++) {
-                li = "<li class='ui-list'>"
-                    +"<img src='image/guanbi.png' class='guanbi'>"
-                    +" <div class='am-g ui-list-title'>"
-                    +" <img src="+img+" class='am-u-sm-4'>"
-                    +" <div class='am-u-sm-8'>"
-                    +" <a>烟雨江南，悠长又寂寥的雨巷</a>"
-                    +" <div class='pet_hd_con_gp_list'>"
-                    +" <span class='pet_hd_con_gp_list_on'>VIP</span>"
-                    +" <span class='pet_hd_con_gp_list_on'>小程序</span>"
-                    +" </div>"
-                    +" </div>"
-                    +" </div>"
-                    +" <hr data-am-widget='divider' style='' class='am-divider am-divider-default user-divider'/>"
-                    +" <div class='am-g ui-list-author'>"
-                    +" <div class='am-u-sm-4 clean'>"
-                    +" <img src='img/a1.png'>"
-                    +" <span>信息咨讯</span>"
-                    +" </div>"
-                    +" <div class='am-u-sm-8'>"
-                    +" <span>刚刚</span>"
-                    +" <div class='zan'>"
-                    +" <img src='image/zan-g.png'>"
-                    +" <span>18</span>"
-                    +" </div>"
-                    +" </div>"
-                    +" </div>"
-                    +" </li>";
-                el.append(li);
-            }
+            var data = JSON.stringify({"userid": "4e2ecf90-61b7-4314-8992-c34f2e541b7b","pages":"4"});
+            $.ajax({
+                url: 'http://101.200.76.209:8080/youxi/v1/contents',
+                type: "POST",
+                data: data,
+                async: false,       //关键是这句
+                dataType: 'json',
+                contentType: "application/json",
+                success: function (data) {
+                    if (data.status == 200) {
+                        for (i = 0; i < data.conts.length; i++) {
+                            var lable = '';
+                            $.each(data.conts[i].labels,function (k, v) {
+                                lable = lable + "<span class='pet_hd_con_gp_list_on'>" + v.desp + "</span>";
+                            })
+                            if(data.conts[i].isthumbup == 1){
+                                zanimg = "image/zan-b.png";
+                            }else{
+                                zanimg = "image/zan-g.png";
+                            }
+                            li = "<li class='ui-list'>"
+                                + "<img src='image/guanbi.png' class='guanbi'>"
+                                + " <div class='am-g ui-list-title'>"
+                                + " <img src='" + data.conts[i].icon + "' class='am-u-sm-4'>"
+                                + " <div class='am-u-sm-8'>"
+                                + " <a data-url='" + data.conts[i].url + "' data-id = '" + data.conts[i].id + "'>" + data.conts[i].title + "</a>"
+                                + " <div class='pet_hd_con_gp_list'>"
+                                + lable
+                                + " </div>"
+                                + " </div>"
+                                + " </div>"
+                                + " <hr data-am-widget='divider' style='' class='am-divider am-divider-default user-divider'/>"
+                                + " <div class='am-g ui-list-author'>"
+                                + " <div class='am-u-sm-4 clean'>"
+                                + " <img src='img/a1.png'>"
+                                + " <span>" + data.conts[i].officialaccount + "</span>"
+                                + " </div>"
+                                + " <div class='am-u-sm-8'>"
+                                + " <span>" + data.conts[i].updatetime + "</span>"
+                                + " <div class='zan'>"
+                                + " <img src='"+zanimg+"' data-id='" + data.conts[i].id + "'>"
+                                + " <span>" + data.conts[i].qtyofthumbup + "</span>"
+                                + " </div>"
+                                + " </div>"
+                                + " </div>"
+                                + " </li>";
+                            el.append(li);
+                        }
+                    } else {
+                        new Toast({
+                            context: $('body'),
+                            message: '暂无更多数据'
+                        }).show();
+                    }
+                },
+                error: function () {
+                    alert('error');
+                }
+            });
             myScroll.refresh();
         }, 1000);
 

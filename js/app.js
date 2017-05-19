@@ -45,8 +45,45 @@ $(function () {
     $(document).on('click','.zan img',function () {
         if($(this).attr('src')=='image/zan-g.png'){
             $(this).attr('src','image/zan-b.png');
+            var id = $(this).data('id');
             var zanNum = parseInt($(this).next().text())+1;
             $(this).next().text(zanNum);
+            var data = JSON.stringify({"userid": "4e2ecf90-61b7-4314-8992-c34f2e541b7b"});
+            var zan = $(this);
+            $.ajax({
+                url: 'http://101.200.76.209:8080/youxi/v1/contents/'+id+'/thumbup',
+                type: "POST",
+                data: data,
+                async: false,       //关键是这句
+                dataType: 'json',
+                contentType: "application/json",
+                success: function (data) {
+                    console.log(data);
+                    if(data.status == 200){
+                        new Toast({
+                            context: $('body'),
+                            message: '点赞成功'
+                        }).show();
+                    }else{
+                        $(zan).attr('src','image/zan-g.png');
+                        var zanNum = parseInt($(zan).next().text())-1;
+                        $(zan).next().text(zanNum);
+                        new Toast({
+                            context: $('body'),
+                            message: '点赞失败'
+                        }).show();
+                    }
+                },error:function () {
+                    $(zan).attr('src','image/zan-g.png');
+                    var zanNum = parseInt($(zan).next().text())-1;
+                    alert(zanNum);
+                    $(zan).next().text(zanNum);
+                    new Toast({
+                        context: $('body'),
+                        message: '点赞失败'
+                    }).show();
+                }
+            });
         }else{
             new Toast({
                 context : $('body'),
@@ -110,11 +147,29 @@ function first_entry() {
         set_sess_storage('first_soft',getNowFormatDate());
     }else{
         //拿到当前时间，为用户返回时间，ajax
+        set_sess_storage('over_time',getNowFormatDate());
         console.log('用户浏览item-id为'+window.sessionStorage.getItem('item_id')+'进入时间为'+window.sessionStorage.getItem('entry_time')+'离开时间为'+
             window.sessionStorage.getItem('over_time'));
-        set_sess_storage('over_time',getNowFormatDate());
-        alert('用户浏览item-id为'+window.sessionStorage.getItem('item_id')+'进入时间为'+window.sessionStorage.getItem('entry_time')+'离开时间为'+
-            window.sessionStorage.getItem('over_time'));
+        var date1=new Date(window.sessionStorage.getItem('entry_time'));
+        var date2=new Date(window.sessionStorage.getItem('over_time'));
+        var date3=(date2.getTime()-date1.getTime())/1000;
+        var data = JSON.stringify({"userid": "4e2ecf90-61b7-4314-8992-c34f2e541b7b","op":{"dwelltime":date3}});
+        $.ajax({
+            url: 'http://101.200.76.209:8080/youxi/v1/contents/'+window.sessionStorage.getItem('item_id')+'/dwelltime',
+            type: "POST",
+            data: data,
+            // async: false,       //关键是这句
+            dataType: 'json',
+            contentType: "application/json",
+            success: function (data) {
+                console.log(data);
+                if(data.status == 200){
+
+                }
+            },error:function () {
+
+            }
+        });
         window.sessionStorage.clear();
     }
 }
@@ -312,10 +367,11 @@ Toast.prototype = {
         msgDIV.push('<span>'+this.message+'</span>');
         msgDIV.push('</div>');
         msgEntity = $(msgDIV.join('')).appendTo(this.context);
-        //设置消息样式
-        var left = this.left == null ? this.context.width()/2-msgEntity.find('span').width()/2 : this.left;
+        //设置消息样式 - 180
+        // var left = this.left == null ? this.context.width()/2-(msgEntity.find('span').width()/2+20) : this.left;
+        var left = this.left == null ? window.screen.width/2-msgEntity.find('span').width()/2-5 : this.left;
         var top = this.top == null ? '40px' : this.top;
-        msgEntity.css({position:'fixed',bottom:top,'z-index':'99',left:left,'background-color':'black',color:'white','font-size':'15px',padding:'10px',margin:'10px'});
+        msgEntity.css({position:'fixed',bottom:top,'z-index':'99',left:left,'background-color':'black',color:'white','font-size':'15px',padding:'10px',margin:'10px auto'});
         msgEntity.hide();
     },
     //显示动画

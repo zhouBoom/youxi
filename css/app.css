@@ -226,6 +226,7 @@ textarea { -webkit-appearance: none;}
     background: #42C6C8;
     border: 1px solid #42C6C8;
     color: #fff;
+    margin-left: 2px;
 }
 .guanbi{
     position: absolute;
