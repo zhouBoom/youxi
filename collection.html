@@ -9,9 +9,22 @@
     <link rel="stylesheet" href="css/amazeui.min.css">
     <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/pullToRefresh.css"/>
+    <link rel="stylesheet" href="css/loading.css">
     <title>我的收藏</title>
 </head>
 <body>
+<div class="inner">
+    <div class="load-container load_dh">
+        <div class="spinner">
+            <div class="rect1"></div>
+            <div class="rect2"></div>
+            <div class="rect3"></div>
+            <div class="rect4"></div>
+            <div class="rect5"></div>
+            <span>正在搜索</span>
+        </div>
+    </div>
+</div>
 <header>
     <div class="search">
         <form action="" onsubmit="return checksearch()" id="searchForm" name="searchForm">
@@ -119,12 +132,14 @@
 <script src="http://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="js/iscroll.js"></script>
 <script src="js/pullToRefresh.js"></script>
-<script src="js/app.js" type="text/javascript"></script>
+<!--<script src="js/app.js" type="text/javascript"></script>-->
 <!--<script src="js/amazeui.min.js" type="text/javascript"></script>-->
 <script src="js/amazeui.lazyload.min.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(function () {
+        Refresh();
         $('#wrapper').css('height', window.screen.height - 90 + 'px');
+
     });
     refresher.init({
 
@@ -137,7 +152,7 @@
     });
 
     function Refresh() {
-
+        alert_show();
         setTimeout(function () {	// <-- Simulate network congestion, remove setTimeout from production!
 
             var el, li, i;
@@ -146,71 +161,241 @@
 
             el.html('')
 
-            for (i = 0; i < 2; i++) {
-
-            li = "<li class='ui-list'>"
-                +"<img src='image/guanbi.png' class='guanbi'>"
-                +" <div class='am-g ui-list-title'>"
-                +" <img src='img/a3.png' class='am-u-sm-4'>"
-                +" <div class='am-u-sm-8'>"
-                +" <a>原来腾讯还出了这些良心app</a>"
-                +" <div class='pet_hd_con_gp_list'>"
-                +" <span class='pet_hd_con_gp_list_on'>VIP</span>"
-                +" <span class='pet_hd_con_gp_list_on'>小程序</span>"
-                +" </div>"
-                +" </div>"
-                +" </div>"
-                +" <hr data-am-widget='divider' style='' class='am-divider am-divider-default user-divider'/>"
-                +" <div class='am-g ui-list-author'>"
-                +" <div class='am-u-sm-4 clean'>"
-                +" <img src='img/a1.png'>"
-                +" <span>信息咨讯</span>"
-                +" </div>"
-                +" <div class='am-u-sm-8'>"
-                +" <span>刚刚</span>"
-                +" </div>"
-                +" </div>"
-                +" </li>";
-                el.append(li)
-            }
+            var data = JSON.stringify({"userid": "4e2ecf90-61b7-4314-8992-c34f2e541b7b","pages":"1"});
+            $.ajax({
+                url: 'http://101.200.76.209:8080/youxi/v1/favorites',
+                type: "POST",
+                data: data,
+                async: false,       //关键是这句
+                dataType: 'json',
+                contentType: "application/json",
+                success: function (data) {
+                    if (data.status == 200) {
+                        if(data.conts.length==0){
+                            new Toast({
+                                context: $('body'),
+                                message: '暂无更多数据'
+                            }).show();
+                        }
+                        console.log(data);
+                        for (i = 0; i < data.conts.length; i++) {
+                            var lable = '';
+                            $.each(data.conts[i].labels,function (k, v) {
+                                lable = lable + "<span class='pet_hd_con_gp_list_on'>" + v.desp + "</span>";
+                            })
+                            li = "<li class='ui-list'>"
+                                + "<img src='image/guanbi.png' class='guanbi' data-id ='" + data.conts[i].id + "'>"
+                                + " <div class='am-g ui-list-title'>"
+                                + " <img src='" + data.conts[i].icon + "' class='am-u-sm-4'>"
+                                + " <div class='am-u-sm-8'>"
+                                + " <a data-url='" + data.conts[i].url + "' data-id = '" + data.conts[i].id + "'>" + data.conts[i].title + "</a>"
+                                + " <div class='pet_hd_con_gp_list'>"
+                                + lable
+                                + " </div>"
+                                + " </div>"
+                                + " </div>"
+                                + " <hr data-am-widget='divider' style='' class='am-divider am-divider-default user-divider'/>"
+                                + " <div class='am-g ui-list-author'>"
+                                + " <div class='am-u-sm-4 clean'>"
+                                + " <img src='img/a1.png'>"
+                                + " <span>" + data.conts[i].officialaccount + "</span>"
+                                + " </div>"
+                                + " <div class='am-u-sm-8'>"
+                                + " <span>" + data.conts[i].updatetime + "</span>"
+                                + " </div>"
+                                + " </div>"
+                                + " </li>";
+                            el.append(li);
+                        }
+                        alert_hid();
+                    } else {
+                        new Toast({
+                            context: $('body'),
+                            message: '暂无更多数据'
+                        }).show();
+                    }
+                },
+                error: function () {
+                    alert('error');
+                }
+            });
             myScroll.refresh();
         }, 1000);
     }
-    var o = '2';
+    var num=2;
     function Load() {
-        setTimeout(function () {// <-- Simulate network congestion, remove setTimeout from production!
+        alert_show();
+        setTimeout(function () {
             var el, li, i;
-            var img = 'img/a'+o+'.png';
-            o=parseInt(o)+1;
             el = $("#wrapper ul");
-            for (i = 0; i < 2; i++) {
-                li = "<li class='ui-list'>"
-                    +" <div class='am-g ui-list-title'>"
-                    +" <img src="+img+" class='am-u-sm-4'>"
-                    +" <div class='am-u-sm-8'>"
-                    +" <a>烟雨江南，悠长又寂寥的雨巷</a>"
-                    +" <div class='pet_hd_con_gp_list'>"
-                    +" <span class='pet_hd_con_gp_list_on'>VIP</span>"
-                    +" <span class='pet_hd_con_gp_list_on'>小程序</span>"
-                    +" </div>"
-                    +" </div>"
-                    +" </div>"
-                    +" <hr data-am-widget='divider' style='' class='am-divider am-divider-default user-divider'/>"
-                    +" <div class='am-g ui-list-author'>"
-                    +" <div class='am-u-sm-4 clean'>"
-                    +" <img src='img/a1.png'>"
-                    +" <span>信息咨讯</span>"
-                    +" </div>"
-                    +" <div class='am-u-sm-8'>"
-                    +" <span>刚刚</span>"
-                    +" </div>"
-                    +" </div>"
-                    +" </li>";
-                el.append(li);
-            }
+            var data = JSON.stringify({"userid": "4e2ecf90-61b7-4314-8992-c34f2e541b7b","pages":num});
+            console.log('fuck'+data);
+            num++;
+            $.ajax({
+                url: 'http://101.200.76.209:8080/youxi/v1/favorites',
+                type: "POST",
+                data: data,
+                async: false,       //关键是这句
+                dataType: 'json',
+                contentType: "application/json",
+                success: function (data) {
+                    if (data.status == 200) {
+                        if(data.conts.length==0){
+                            new Toast({
+                                context: $('body'),
+                                message: '暂无更多数据'
+                            }).show();
+                        }
+                        console.log(data);
+                        for (i = 0; i < data.conts.length; i++) {
+                            var lable = '';
+                            $.each(data.conts[i].labels,function (k, v) {
+                                lable = lable + "<span class='pet_hd_con_gp_list_on'>" + v.desp + "</span>";
+                            })
+                            li = "<li class='ui-list'>"
+                                + "<img src='image/guanbi.png' class='guanbi' data-id ='" + data.conts[i].id + "'>"
+                                + " <div class='am-g ui-list-title'>"
+                                + " <img src='" + data.conts[i].icon + "' class='am-u-sm-4'>"
+                                + " <div class='am-u-sm-8'>"
+                                + " <a data-url='" + data.conts[i].url + "' data-id = '" + data.conts[i].id + "'>" + data.conts[i].title + "</a>"
+                                + " <div class='pet_hd_con_gp_list'>"
+                                + lable
+                                + " </div>"
+                                + " </div>"
+                                + " </div>"
+                                + " <hr data-am-widget='divider' style='' class='am-divider am-divider-default user-divider'/>"
+                                + " <div class='am-g ui-list-author'>"
+                                + " <div class='am-u-sm-4 clean'>"
+                                + " <img src='img/a1.png'>"
+                                + " <span>" + data.conts[i].officialaccount + "</span>"
+                                + " </div>"
+                                + " <div class='am-u-sm-8'>"
+                                + " <span>" + data.conts[i].updatetime + "</span>"
+                                + " </div>"
+                                + " </div>"
+                                + " </li>";
+                            el.append(li);
+                        }
+                        alert_hid();
+                    } else {
+                        new Toast({
+                            context: $('body'),
+                            message: '暂无更多数据'
+                        }).show();
+                    }
+                },
+                error: function () {
+                    alert('error');
+                }
+            });
             myScroll.refresh();
         }, 1000);
 
+    }
+
+
+
+    $(document).on('click','.guanbi',function () {
+        //ajax请求删除方法
+        $(this).parents('.ui-list').fadeTo("slow", 0.01, function(){//fade
+            var id = $(this).children('.guanbi').data('id');
+            var data = JSON.stringify({"userid": "4e2ecf90-61b7-4314-8992-c34f2e541b7b"});
+            $(this).remove();
+            $.ajax({
+                url: 'http://101.200.76.209:8080/youxi/v1/favorites/'+id,
+                type: "DELETE",
+                data: data,
+                async: false,       //关键是这句
+                dataType: 'json',
+                contentType: "application/json",
+                success: function (data) {
+                    console.log(data);
+                    if(data.status == 200){
+                        new Toast({
+                            context: $('body'),
+                            message: '删除成功'
+                        }).show();
+                    }else{
+                        new Toast({
+                            context: $('body'),
+                            message: '删除失败'
+                        }).show();
+                    }
+                },
+                error:function () {
+                    new Toast({
+                        context: $('body'),
+                        message: '删除失败,接口错误'
+                    }).show();
+                }
+            });
+            if($('.ui-list').length == 0){
+                new Toast({
+                    context : $('body'),
+                    message : '不能全部删除'
+                }).show();
+                Refresh();
+            }
+        });
+    });
+
+    function alert_show() {
+        $('.inner').css({
+            'display':"block"
+        })
+    }
+    function alert_hid() {
+        $('.inner').css({
+            'display':"none"
+        })
+    }
+
+    /**
+     * 模仿android里面的Toast效果，主要是用于在不打断程序正常执行的情况下显示提示数据
+     * @param config
+     * @return
+     */
+    var Toast = function(config){
+        this.context = config.context==null?$('body'):config.context;//上下文
+        this.message = config.message;//显示内容
+        this.time = config.time==null?3000:config.time;//持续时间
+        this.left = config.left;//距容器左边的距离
+        this.top = config.top;//距容器上方的距离
+        this.init();
+    }
+    var msgEntity;
+    Toast.prototype = {
+        //初始化显示的位置内容等
+        init: function () {
+            $("#toastMessage").remove();
+            //设置消息体
+            var msgDIV = new Array();
+            msgDIV.push('<div id="toastMessage" style="border-radius:18px;-moz-opacity:0.6;opacity:0.6;">');
+            msgDIV.push('<span>' + this.message + '</span>');
+            msgDIV.push('</div>');
+            msgEntity = $(msgDIV.join('')).appendTo(this.context);
+            //设置消息样式 - 180
+            // var left = this.left == null ? this.context.width()/2-(msgEntity.find('span').width()/2+20) : this.left;
+            var left = this.left == null ? window.screen.width / 2 - msgEntity.find('span').width() / 2 - 5 : this.left;
+            var top = this.top == null ? '40px' : this.top;
+            msgEntity.css({
+                position: 'fixed',
+                bottom: top,
+                'z-index': '99',
+                left: left,
+                'background-color': 'black',
+                color: 'white',
+                'font-size': '15px',
+                padding: '10px',
+                margin: '10px auto'
+            });
+            msgEntity.hide();
+        },
+        //显示动画
+        show: function () {
+            msgEntity.fadeIn(this.time / 2);
+            msgEntity.fadeOut(this.time / 2);
+        }
     }
 </script>
 

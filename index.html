@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/amazeui.min.css">
     <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/pullToRefresh.css"/>
+    <link rel="stylesheet" href="css/loading.css">
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script>
         //        function resize(){
@@ -19,11 +20,23 @@
         //        $(function(){resize();});
     </script>
     <title>看点真的</title>
-    <style>
-
-    </style>
 </head>
+<style>
+
+</style>
 <body>
+<div class="inner">
+    <div class="load-container load_dh">
+        <div class="spinner">
+            <div class="rect1"></div>
+            <div class="rect2"></div>
+            <div class="rect3"></div>
+            <div class="rect4"></div>
+            <div class="rect5"></div>
+            <span>正在搜索</span>
+        </div>
+    </div>
+</div>
 <header>
     <div class="search">
         <form action="" onsubmit="return checksearch()" id="searchForm" name="searchForm">
@@ -49,16 +62,16 @@
     <div class="ui-tab" id="tab1">
         <ul class="ui-tab-nav ui-border-b">
             <li>
-                <a class="test_ajax" href="" style="color: #42C6C8;">推荐</a>
+                <span class="test_ajax" data-type="1" >推荐</span>
             </li>
             <li>
-                <a href="">视频</a>
+                <span data-type="2">视频</span>
             </li>
             <li>
-                <a href="">干货</a>
+                <span data-type="3">干货</span>
             </li>
             <li>
-                <a href="">逗逼</a>
+                <span data-type="4">逗逼</span>
             </li>
             <img src="image/drop-down.png">
         </ul>
@@ -126,13 +139,14 @@
         </div>
     </div>
 </div>
+
 <footer class="ui-footer ui-footer-btn">
     <ul class="ui-tiled active">
         <li>
             <a href="index.html">
                 <img src="image/home-b.png">
                 <div>
-                    <span>首页</span>
+                    <span class="test_ajax">首页</span>
                 </div>
             </a>
         </li>
@@ -167,7 +181,20 @@
     $(function () {
         //动态设置刷新的高度
         $('#wrapper').css('height', window.screen.height - 180 + 'px');
+        //li点击
+        $('.ui-tab-nav li span').on('click',function () {
+            $('.ui-tab-nav .test_ajax').removeClass('test_ajax');
+            $(this).addClass("test_ajax");
+            Refresh();
+        });
+
+
     });
+
+    function wx_login() {
+
+    }
+
     refresher.init({
 
         id: "wrapper",
@@ -179,17 +206,17 @@
     });
 
     function Refresh() {
-
-        setTimeout(function () {	// <-- Simulate network congestion, remove setTimeout from production!
-
+        var type = $('.test_ajax').data('type');
+        console.log(type);
+        alert_show();
+        setTimeout(function () {
             var el, li, i, zanimg;
-
             el = $("#wrapper ul");
-
+            num = 1;
             el.html('')
-            var data = JSON.stringify({"userid": "4e2ecf90-61b7-4314-8992-c34f2e541b7b","pages":"3"});
+            var data = JSON.stringify({"userid": "4e2ecf90-61b7-4314-8992-c34f2e541b7b","type":type,"pages":num});
             $.ajax({
-                url: 'http://101.200.76.209:8080/youxi/v1/contents',
+                url: 'http://fxg.ruizsky.com:8080/youxi/v1/contents',
                 type: "POST",
                 data: data,
 //                async: false,       //关键是这句
@@ -197,18 +224,24 @@
                 contentType: "application/json",
                 success: function (data) {
                     if (data.status == 200) {
+                        if(data.conts.length==0){
+                            new Toast({
+                                context: $('body'),
+                                message: '暂无数据'
+                            }).show();
+                        }
                         for (i = 0; i < data.conts.length; i++) {
                             var lable = '';
                             $.each(data.conts[i].labels,function (k, v) {
                                 lable = lable + "<span class='pet_hd_con_gp_list_on'>" + v.desp + "</span>";
                             })
-                            if(data.conts[i].isthumbup == 1){
+                            if(data.conts[i].makeThumbup == 1){
                                 zanimg = "image/zan-b.png";
                             }else{
                                 zanimg = "image/zan-g.png";
                             }
                             li = "<li class='ui-list'>"
-                                + "<img src='image/guanbi.png' class='guanbi'>"
+                                + "<img src='image/guanbi.png' class='guanbi' data-id ='" + data.conts[i].id + "'>"
                                 + " <div class='am-g ui-list-title'>"
                                 + " <img src='" + data.conts[i].icon + "' class='am-u-sm-4'>"
                                 + " <div class='am-u-sm-8'>"
@@ -235,6 +268,7 @@
                                 + " </li>";
                             el.append(li);
                         }
+                        alert_hid();
                     } else {
                         new Toast({
                             context: $('body'),
@@ -251,16 +285,18 @@
         }, 1000);
     }
 
-//    for (var j = 0; j < data.conts[i].labels.length; j++) {
-//    lable = lable + "<span class='pet_hd_con_gp_list_on'>" + data.conts[i].labels[j] + "</span>";
-//    }
     function Load() {
-        setTimeout(function () {// <-- Simulate network congestion, remove setTimeout from production!
+        var type = $('.test_ajax').data('type');
+        console.log(type);
+        alert_show();
+        setTimeout(function () {
             var el, li, i;
             el = $("#wrapper ul");
-            var data = JSON.stringify({"userid": "4e2ecf90-61b7-4314-8992-c34f2e541b7b","pages":"4"});
+            num++;
+            var data = JSON.stringify({"userid": "4e2ecf90-61b7-4314-8992-c34f2e541b7b","type":type,"pages":num});
+            console.log(data);
             $.ajax({
-                url: 'http://101.200.76.209:8080/youxi/v1/contents',
+                url: 'http://fxg.ruizsky.com:8080/youxi/v1/contents',
                 type: "POST",
                 data: data,
                 async: false,       //关键是这句
@@ -268,18 +304,25 @@
                 contentType: "application/json",
                 success: function (data) {
                     if (data.status == 200) {
+
+                        if(data.conts.length==0){
+                            new Toast({
+                                context: $('body'),
+                                message: '暂无更多数据'
+                            }).show();
+                        }
                         for (i = 0; i < data.conts.length; i++) {
                             var lable = '';
                             $.each(data.conts[i].labels,function (k, v) {
                                 lable = lable + "<span class='pet_hd_con_gp_list_on'>" + v.desp + "</span>";
                             })
-                            if(data.conts[i].isthumbup == 1){
+                            if(data.conts[i].makeThumbup == 1){
                                 zanimg = "image/zan-b.png";
                             }else{
                                 zanimg = "image/zan-g.png";
                             }
                             li = "<li class='ui-list'>"
-                                + "<img src='image/guanbi.png' class='guanbi'>"
+                                + "<img src='image/guanbi.png' class='guanbi' data-id ='" + data.conts[i].id + "'>"
                                 + " <div class='am-g ui-list-title'>"
                                 + " <img src='" + data.conts[i].icon + "' class='am-u-sm-4'>"
                                 + " <div class='am-u-sm-8'>"
@@ -306,6 +349,7 @@
                                 + " </li>";
                             el.append(li);
                         }
+                        alert_hid();
                     } else {
                         new Toast({
                             context: $('body'),
@@ -321,6 +365,51 @@
         }, 1000);
 
     }
+
+    //调用系统删除接口
+    $(document).on('click','.guanbi',function () {
+        //ajax请求删除方法
+        $(this).parents('.ui-list').fadeTo("slow", 0.01, function(){//fade
+            var id = $(this).children('.guanbi').data('id');
+            var data = JSON.stringify({"userid": "12345678"});
+            $(this).remove();
+            $.ajax({
+                url: 'http://fxg.ruizsky.com:8080/youxi/v1/contents/'+id,
+                type: "DELETE",
+                data: data,
+                async: false,       //关键是这句
+                dataType: 'json',
+                contentType: "application/json",
+                success: function (data) {
+                    console.log(data);
+                    if(data.status == 200){
+                        new Toast({
+                            context: $('body'),
+                            message: '删除成功'
+                        }).show();
+                    }else{
+                        new Toast({
+                            context: $('body'),
+                            message: '删除失败'
+                        }).show();
+                    }
+                },
+                error:function () {
+                    new Toast({
+                        context: $('body'),
+                        message: '删除失败,接口错误'
+                    }).show();
+                }
+            });
+            if($('.ui-list').length == 0){
+                new Toast({
+                    context : $('body'),
+                    message : '不能全部删除'
+                }).show();
+                Refresh();
+            }
+        });
+    });
 </script>
 
 </body>

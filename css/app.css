@@ -5,6 +5,9 @@ ul{
     padding:0;
     margin:0;
 }
+a{
+    color: #000;
+}
 
 /* footer */
 .ui-footer{
@@ -156,11 +159,17 @@ textarea { -webkit-appearance: none;}
     list-style: none;
 }
 .ui-tab a, .ui-tab-nav a {
-    color: #000000;
     font-size: 15px;
     display: inline-block;
     height: 50px;
 }
+
+.ui-tab a, .ui-tab-nav span {
+    font-size: 15px;
+    display: inline-block;
+    height: 50px;
+}
+
 .ui-tab-nav img{
     width: 15px;
     line-height: 40px;
@@ -437,4 +446,7 @@ textarea { -webkit-appearance: none;}
 }
 .follow-list .yixuan{
     margin-left: 10px;
+}
+.test_ajax{
+    color: #42C6C8;
 }

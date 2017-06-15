@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/amazeui.min.css">
     <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/pullToRefresh.css"/>
+    <link rel="stylesheet" href="css/loading.css">
     <title>关注</title>
     <style>
         ul{
@@ -87,6 +88,18 @@
     </style>
 </head>
 <body>
+<div class="inner">
+    <div class="load-container load_dh">
+        <div class="spinner">
+            <div class="rect1"></div>
+            <div class="rect2"></div>
+            <div class="rect3"></div>
+            <div class="rect4"></div>
+            <div class="rect5"></div>
+            <span>正在搜索</span>
+        </div>
+    </div>
+</div>
 <header>
     <div class="search">
         <form action="" onsubmit="return checksearch()" id="searchForm" name="searchForm">
@@ -119,26 +132,7 @@
     </div>
 </section>
 
-<!-- 关注页面搜索已关注公众号 -->
-<div class="follow-history">
-    <div class="follow-list-recomm">
-        <span class="yixuan">历史记录</span>
-        <div class="already">
-            <div class="follow-list-title">
-                <span>十点阅读</span>
-                <button class="follow-state-no">订阅</button>
-            </div>
-            <div class="follow-list-title">
-                <span>北京旅游攻略</span>
-                <button class="follow-state-no">订阅</button>
-            </div>
-            <div class="follow-list-title">
-                <span>云聚咨讯</span>
-                <button class="follow-state-no">订阅</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <footer class="ui-footer ui-footer-btn">
     <ul class="ui-tiled active">
@@ -154,7 +148,7 @@
             <a href="follow.html">
                 <img src="image/guanzhu-b.png">
                 <div>
-                    <span>关注</span>
+                    <span class="test_ajax">关注</span>
                 </div>
             </a>
         </li>
@@ -190,14 +184,16 @@
         <div class="follow-list-already">
             <span class="yixuan">已经关注</span>
             <div class="already">
-                <div class="follow-list-title">
-                    <span>QQ阅读</span>
-                    <button class="follow-state">取消关注</button>
-                </div>
-                <div class="follow-list-title">
-                    <span>QQ阅读</span>
-                    <button class="follow-state">取消关注</button>
-                </div>
+                <ul>
+                <!--<div class="follow-list-title">-->
+                    <!--<span>QQ阅读</span>-->
+                    <!--<button class="follow-state">取消关注</button>-->
+                <!--</div>-->
+                <!--<div class="follow-list-title">-->
+                    <!--<span>QQ阅读</span>-->
+                    <!--<button class="follow-state">取消关注</button>-->
+                <!--</div>-->
+                </ul>
                 <span class="all">展开全部</span>
                 <img src="image/jiazai-t.png">
             </div>
@@ -216,6 +212,26 @@
             </div>
         </div>
     </div>
+    <!-- 关注页面搜索已关注公众号 -->
+    <div class="follow-history">
+        <div class="follow-list-recomm">
+            <span class="yixuan">历史记录</span>
+            <div class="already">
+                <div class="follow-list-title">
+                    <span>十点阅读</span>
+                    <button class="follow-state-no">订阅</button>
+                </div>
+                <div class="follow-list-title">
+                    <span>北京旅游攻略</span>
+                    <button class="follow-state-no">订阅</button>
+                </div>
+                <div class="follow-list-title">
+                    <span>云聚咨讯</span>
+                    <button class="follow-state-no">订阅</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="http://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="js/iscroll.js"></script>
@@ -227,6 +243,42 @@
     $(function () {
         //动态设置刷新的高度
         $('#wrapper').css('height',window.screen.height-140+'px');
+        /**
+         * 首次进入获取已关注公众号
+         */
+        var data = JSON.stringify({"userid":"66a92c10-0312-483f-97b0-85f8bd4cfb09","pages":"1","labelid":"3"});
+        var guanzhu,gz_list;
+        gz_list = $(".already ul");
+        $.ajax({
+            url: 'http://fxg.ruizsky.com:8080/youxi/v1/offiacc',
+            type: "POST",
+            data: data,
+            async: false,       //关键是这句
+            dataType: 'json',
+            contentType: "application/json",
+            success: function (data) {
+                console.log(data);
+                if(data.status == 200){
+                    if(data.offiaccs.length==0){
+                        $('.all').text('暂无关注')
+                    }
+                    for (i = 0; i < data.offiaccs.length; i++) {
+                        guanzhu = "<div class='follow-list-title'>"
+                            + "<span>"+data.offiaccs[i].name+"</span>"
+                            + "<button class='follow-state' data-id='"+data.offiaccs[i].id+"'>取消关注</button>"
+                            + "</div>";
+                        gz_list.append(guanzhu);
+                    }
+                }else{
+
+                }
+            },error:function () {
+                new Toast({
+                    context: $('body'),
+                    message: '获取失败'
+                }).show();
+            }
+        });
     });
     $('.ui-searchbar').on('click', function () {
         $('.ui-searchbar-wrap').addClass('focus');
@@ -281,87 +333,157 @@
         pullUpAction: Load
 
     });
-    var generatedCount = 0;
+
     function Refresh() {
-        setTimeout(function () {	// <-- Simulate network congestion, remove setTimeout from production!
-
-            var el, li, i;
-
+        alert_show();
+        setTimeout(function () {
+            var el, li, i, zanimg;
             el = $("#wrapper ul");
-
+            num = 1;
             el.html('')
+            var data = JSON.stringify({"userid": "4e2ecf90-61b7-4314-8992-c34f2e541b7b","pages":num,"followed":"1"});
+            $.ajax({
+                url: 'http://fxg.ruizsky.com:8080/youxi/v1/contents',
+                type: "POST",
+                data: data,
+                dataType: 'json',
+                contentType: "application/json",
+                success: function (data) {
+                    if (data.status == 200) {
+                        if(data.conts.length==0){
+                            new Toast({
+                                context: $('body'),
+                                message: '暂无数据'
+                            }).show();
+                        }
+                        for (i = 0; i < data.conts.length; i++) {
+                            var lable = '';
+                            $.each(data.conts[i].labels,function (k, v) {
+                                lable = lable + "<span class='pet_hd_con_gp_list_on'>" + v.desp + "</span>";
+                            })
+                            if(data.conts[i].makeThumbup == 1){
+                                zanimg = "image/zan-b.png";
+                            }else{
+                                zanimg = "image/zan-g.png";
+                            }
+                            li = "<li class='ui-list'>"
+                                + "<img src='image/guanbi.png' class='guanbi' data-id ='" + data.conts[i].id + "'>"
+                                + " <div class='am-g ui-list-title'>"
+                                + " <img src='" + data.conts[i].icon + "' class='am-u-sm-4'>"
+                                + " <div class='am-u-sm-8'>"
+                                + " <a data-url='" + data.conts[i].url + "' data-id = '" + data.conts[i].id + "'>" + data.conts[i].title + "</a>"
+                                + " <div class='pet_hd_con_gp_list'>"
+                                + lable
+                                + " </div>"
+                                + " </div>"
+                                + " </div>"
+                                + " <hr data-am-widget='divider' style='' class='am-divider am-divider-default user-divider'/>"
+                                + " <div class='am-g ui-list-author'>"
+                                + " <div class='am-u-sm-4 clean'>"
+                                + " <img src='img/a1.png'>"
+                                + " <span>" + data.conts[i].officialaccount + "</span>"
+                                + " </div>"
+                                + " <div class='am-u-sm-8'>"
+                                + " <span>" + data.conts[i].updatetime + "</span>"
+                                + " <div class='zan'>"
+                                + " <img src='"+zanimg+"' data-id='" + data.conts[i].id + "'>"
+                                + " <span>" + data.conts[i].qtyofthumbup + "</span>"
+                                + " </div>"
+                                + " </div>"
+                                + " </div>"
+                                + " </li>";
+                            el.append(li);
+                        }
+                        alert_hid();
+                    } else {
+                        new Toast({
+                            context: $('body'),
+                            message: '暂无更多数据'
+                        }).show();
+                    }
+                },
+                error: function () {
+                    alert('error');
+                }
+            });
 
-            for (i = 0; i < 2; i++) {
-
-                li = "<li class='ui-list'>"
-                    +"<img src='image/guanbi.png' class='guanbi'>"
-                    +" <div class='am-g ui-list-title'>"
-                    +" <img src='img/a3.png' class='am-u-sm-4'>"
-                    +" <div class='am-u-sm-8'>"
-                    +" <a>原来腾讯还出了这些良心app</a>"
-                    +" <div class='pet_hd_con_gp_list'>"
-                    +" <span class='pet_hd_con_gp_list_on'>VIP</span>"
-                    +" <span class='pet_hd_con_gp_list_on'>小程序</span>"
-                    +" </div>"
-                    +" </div>"
-                    +" </div>"
-                    +" <hr data-am-widget='divider' style='' class='am-divider am-divider-default user-divider'/>"
-                    +" <div class='am-g ui-list-author'>"
-                    +" <div class='am-u-sm-4 clean'>"
-                    +" <img src='img/a1.png'>"
-                    +" <span>信息咨讯</span>"
-                    +" </div>"
-                    +" <div class='am-u-sm-8'>"
-                    +" <span>刚刚</span>"
-                    +" <div class='zan'>"
-                    +" <img src='image/zan-g.png'>"
-                    +" <span>18</span>"
-                    +" </div>"
-                    +" </div>"
-                    +" </div>"
-                    +" </li>";
-                el.append(li)
-            }
             myScroll.refresh();
         }, 1000);
     }
-    var o = '2';
     function Load() {
-        setTimeout(function () {// <-- Simulate network congestion, remove setTimeout from production!
+        alert_show();
+        setTimeout(function () {
             var el, li, i;
-            var img = 'img/a'+o+'.png';
-            o=parseInt(o)+1;
             el = $("#wrapper ul");
-            for (i = 0; i < 2; i++) {
-                li = "<li class='ui-list'>"
-                    +"<img src='image/guanbi.png' class='guanbi'>"
-                    +" <div class='am-g ui-list-title'>"
-                    +" <img src="+img+" class='am-u-sm-4'>"
-                    +" <div class='am-u-sm-8'>"
-                    +" <a>烟雨江南，悠长又寂寥的雨巷</a>"
-                    +" <div class='pet_hd_con_gp_list'>"
-                    +" <span class='pet_hd_con_gp_list_on'>VIP</span>"
-                    +" <span class='pet_hd_con_gp_list_on'>小程序</span>"
-                    +" </div>"
-                    +" </div>"
-                    +" </div>"
-                    +" <hr data-am-widget='divider' style='' class='am-divider am-divider-default user-divider'/>"
-                    +" <div class='am-g ui-list-author'>"
-                    +" <div class='am-u-sm-4 clean'>"
-                    +" <img src='img/a1.png'>"
-                    +" <span>信息咨讯</span>"
-                    +" </div>"
-                    +" <div class='am-u-sm-8'>"
-                    +" <span>刚刚</span>"
-                    +" <div class='zan'>"
-                    +" <img src='image/zan-g.png'>"
-                    +" <span>18</span>"
-                    +" </div>"
-                    +" </div>"
-                    +" </div>"
-                    +" </li>";
-                el.append(li);
-            }
+            num++;
+            var data = JSON.stringify({"userid": "4e2ecf90-61b7-4314-8992-c34f2e541b7b","pages":num,"followed":"1"});
+            console.log(data);
+            $.ajax({
+                url: 'http://fxg.ruizsky.com:8080/youxi/v1/contents',
+                type: "POST",
+                data: data,
+                async: false,       //关键是这句
+                dataType: 'json',
+                contentType: "application/json",
+                success: function (data) {
+                    if (data.status == 200) {
+
+                        if(data.conts.length==0){
+                            new Toast({
+                                context: $('body'),
+                                message: '暂无更多数据'
+                            }).show();
+                        }
+                        for (i = 0; i < data.conts.length; i++) {
+                            var lable = '';
+                            $.each(data.conts[i].labels,function (k, v) {
+                                lable = lable + "<span class='pet_hd_con_gp_list_on'>" + v.desp + "</span>";
+                            })
+                            if(data.conts[i].makeThumbup == 1){
+                                zanimg = "image/zan-b.png";
+                            }else{
+                                zanimg = "image/zan-g.png";
+                            }
+                            li = "<li class='ui-list'>"
+                                + "<img src='image/guanbi.png' class='guanbi' data-id ='" + data.conts[i].id + "'>"
+                                + " <div class='am-g ui-list-title'>"
+                                + " <img src='" + data.conts[i].icon + "' class='am-u-sm-4'>"
+                                + " <div class='am-u-sm-8'>"
+                                + " <a data-url='" + data.conts[i].url + "' data-id = '" + data.conts[i].id + "'>" + data.conts[i].title + "</a>"
+                                + " <div class='pet_hd_con_gp_list'>"
+                                + lable
+                                + " </div>"
+                                + " </div>"
+                                + " </div>"
+                                + " <hr data-am-widget='divider' style='' class='am-divider am-divider-default user-divider'/>"
+                                + " <div class='am-g ui-list-author'>"
+                                + " <div class='am-u-sm-4 clean'>"
+                                + " <img src='img/a1.png'>"
+                                + " <span>" + data.conts[i].officialaccount + "</span>"
+                                + " </div>"
+                                + " <div class='am-u-sm-8'>"
+                                + " <span>" + data.conts[i].updatetime + "</span>"
+                                + " <div class='zan'>"
+                                + " <img src='"+zanimg+"' data-id='" + data.conts[i].id + "'>"
+                                + " <span>" + data.conts[i].qtyofthumbup + "</span>"
+                                + " </div>"
+                                + " </div>"
+                                + " </div>"
+                                + " </li>";
+                            el.append(li);
+                        }
+                        alert_hid();
+                    } else {
+                        new Toast({
+                            context: $('body'),
+                            message: '暂无更多数据'
+                        }).show();
+                    }
+                },
+                error: function () {
+                    alert('error');
+                }
+            });
             myScroll.refresh();
         }, 1000);
 

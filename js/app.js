@@ -7,19 +7,45 @@ $(function () {
     //进入
     first_entry();
     pushHistory();
-    $(document).on('click','.guanbi',function () {
-        //ajax请求删除方法
-        $(this).parents('.ui-list').fadeTo("slow", 0.01, function(){//fade
-            $(this).remove();
-            new Toast({
-                context : $('body'),
-                message : $('.ui-list').length
-            }).show();
-            if($('.ui-list').length == 0){
-                Refresh();
-            }
-        });
-    });
+    // $(document).on('click','.guanbi',function () {
+    //     //ajax请求删除方法
+    //     $(this).parents('.ui-list').fadeTo("slow", 0.01, function(){//fade
+    //         var id = $(this).data('id');
+    //         alert(id);
+    //         var data = JSON.stringify({"userid": "4e2ecf90-61b7-4314-8992-c34f2e541b7b","contentid":id});
+    //         var del = $(this);
+    //         $.ajax({
+    //             url: 'http://101.200.76.209:8080/youxi/v1/delete',
+    //             type: "POST",
+    //             data: data,
+    //             async: false,       //关键是这句
+    //             dataType: 'json',
+    //             contentType: "application/json",
+    //             success: function (data) {
+    //                 console.log(data);
+    //                 if(data.status == 200){
+    //                     new Toast({
+    //                         context: $('body'),
+    //                         message: '删除成功'
+    //                     }).show();
+    //                     del.remove();
+    //                 }else{
+    //                     new Toast({
+    //                         context: $('body'),
+    //                         message: '删除失败'
+    //                     }).show();
+    //                 }
+    //             }
+    //         });
+    //         if($('.ui-list').length == 0){
+    //             new Toast({
+    //                 context : $('body'),
+    //                 message : '不能全部删除'
+    //             }).show();
+    //             Refresh();
+    //         }
+    //     });
+    // });
 //主题选择切换
     $(".ui-tab-nav img").on('click', function () {
         $('section').css('display', 'none');
@@ -114,27 +140,71 @@ var item_id = null;
 
 });
 
-//关注
+//取消关注
 $(document).on('click','.follow-state',function () {
         new Toast({
            context:$('body'),
             message:'取消关注'
         }).show();
+        var id = $(this).data('id');
+        var data = JSON.stringify({"userid": "66a92c10-0312-483f-97b0-85f8bd4cfb09"});
+    $.ajax({
+        url: 'http://101.200.76.209:8080/youxi/v1/offiacc/'+id+'/status/0',
+        type: "POST",
+        data: data,
+        async: false,       //关键是这句
+        dataType: 'json',
+        contentType: "application/json",
+        success: function (data) {
+            console.log(data);
+            new Toast({
+                context: $('body'),
+                message: '取消关注成功'
+            }).show();
+        },error:function () {
+            new Toast({
+                context: $('body'),
+                message: '取消关注失败，请重试'
+            }).show();
+        }
+    });
     });
 
-//取消关注
+//关注
     $('.follow-state-no').on('click',function () {
         new Toast({
            context : $('body'),
            message : "关注"
         }).show();
+        var id = $(this).data('id');
+        var data = JSON.stringify({"userid": "4e2ecf90-61b7-4314-8992-c34f2e541b7b"});
+        $.ajax({
+            url: 'http://101.200.76.209:8080/youxi/v1/offiacc/'+id+'/status/1',
+            type: "POST",
+            data: data,
+            async: false,       //关键是这句
+            dataType: 'json',
+            contentType: "application/json",
+            success: function (data) {
+                console.log(data);
+                new Toast({
+                    context: $('body'),
+                    message: '关注成功'
+                }).show();
+            },error:function () {
+                new Toast({
+                    context: $('body'),
+                    message: '关注失败，请重试'
+                }).show();
+            }
+        });
     });
 
 //展开全部
     $('.all').on('click',function () {
         new Toast({
             context : $('body'),
-            message : "展开全部"
+            message : "跳转至用户关注所有公众号的界面"
         }).show();
     });
 
@@ -253,10 +323,15 @@ function set_sess_storage(key,value) {
 
 //当状态改变的时候执行的函数
 function handle2() {
+    //ajax请求数据，动态展示
     if ($("#search-kw2").val() != '') {
+        $('.follow-history').css('display','block');
+        $('.follow-list').css('display','none');
         $("#search_btn2").html("检索");
         document.getElementById("search_btn").removeEventListener("click", cancel2, false);
     } else {
+        $('.follow-history').css('display','none');
+        $('.follow-list').css('display','block');
         $("#search_btn2").html("取消");
     }
 }
@@ -333,15 +408,28 @@ $('.search .follow-search').on('click',function () {
     $('.follow-img').css('display','none');
     $('.search .follow').removeClass('follow');
     $('section').css('display','none');
-    $('.follow-history').css('display','block');
+    // $('.follow-history').css('display','block');
 });
 
 $('.search .follow-cancel').on('click',function () {
     $('.follow-img').css('display','block');
     $('#searchForm .ui-searchbar-wrap').addClass('follow');
     $('section').css('display','block');
-    $('.follow-history').css('display','none');
+    // $('.follow-history').css('display','none');
 });
+/**
+ * loading层
+ */
+function alert_show() {
+    $('.inner').css({
+        'display':"block"
+    })
+}
+function alert_hid() {
+    $('.inner').css({
+        'display':"none"
+    })
+}
 
 /**
  * 模仿android里面的Toast效果，主要是用于在不打断程序正常执行的情况下显示提示数据
